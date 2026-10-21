@@ -13,7 +13,7 @@ def get_dashboard():
     rooms = GameRoom.objects.annotate(
         table_count=Count('table'),
         avg_price=Avg('table__price')
-    ).prefetch_related('table_set')
+    ).prefetch_related('table_set', 'table_set__gamesession_set')
 
     total_tables = Table.objects.count()
 

@@ -4,7 +4,8 @@ from django.views.decorators.http import require_POST
 
 from bil_club.services.errors import (
     NotFoundError,
-    ValidationError
+    ValidationError,
+    ForbiddenError
 )
 from bil_club.services import (
     dashboard as dashboard_service,
@@ -25,7 +26,7 @@ def room_detail(request, room_id):
         context = room_service.get_room_detail(room_id)
     except NotFoundError as error:
         response = {"code": error.code, "detail": error.detail}
-        return JsonResponse(response)
+        return JsonResponse(response, status=error.code)
     return render(request, 'bil_club/rooms.html', context)
 
 
@@ -36,7 +37,7 @@ def clients(request):
         context = client_service.get_clients(name=name, skill=skill)
     except ValidationError as error:
         response = {"code": error.code, "detail": error.detail}
-        return JsonResponse(response)
+        return JsonResponse(response, status=error.code)
     return render(request, 'bil_club/clients.html', context)
 
 
@@ -45,10 +46,10 @@ def client_profile(request, client_id):
         context = client_service.get_client_profile(client_id)
     except NotFoundError as error:
         response = {"code": error.code, "detail": error.detail}
-        return JsonResponse(response)
+        return JsonResponse(response, status=error.code)
     except ValidationError as error:
         response = {"code": error.code, "detail": error.detail}
-        return JsonResponse(response)
+        return JsonResponse(response, status=error.code)
     return render(request, 'bil_club/client_profile.html', context)
 
 
@@ -65,10 +66,10 @@ def start_session(request, table_id):
         return JsonResponse(result)
     except NotFoundError as error:
         response = {"code": error.code, "detail": error.detail}
-        return JsonResponse(response)
+        return JsonResponse(response, status=error.code)
     except ValidationError as error:
         response = {"code": error.code, "detail": error.detail}
-        return JsonResponse(response)
+        return JsonResponse(response, status=error.code)
 
 
 @require_POST
@@ -79,10 +80,13 @@ def end_session(request, session_id):
         return JsonResponse(result)
     except NotFoundError as error:
         response = {"code": error.code, "detail": error.detail}
-        return JsonResponse(response)
+        return JsonResponse(response, status=error.code)
     except ValidationError as error:
         response = {"code": error.code, "detail": error.detail}
-        return JsonResponse(response)
+        return JsonResponse(response, status=error.code)
+    except ForbiddenError as error:
+        response = {"code": error.code, "detail": error.detail}
+        return JsonResponse(response, status=error.code)
 
 
 @require_POST
@@ -95,7 +99,7 @@ def add_client(request):
         return JsonResponse(result)
     except ValidationError as error:
         response = {"code": error.code, "detail": error.detail}
-        return JsonResponse(response)
+        return JsonResponse(response, status=error.code)
 
 
 @require_POST
@@ -115,7 +119,7 @@ def update_table(request, table_id):
         return JsonResponse(result)
     except NotFoundError as error:
         response = {"code": error.code, "detail": error.detail}
-        return JsonResponse(response)
+        return JsonResponse(response, status=error.code)
     except ValidationError as error:
         response = {"code": error.code, "detail": error.detail}
-        return JsonResponse(response)
+        return JsonResponse(response, status=error.code)

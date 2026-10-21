@@ -1,0 +1,56 @@
+<div class="col-12 col-md-6 col-lg-4">
+    <div class="card" id="table-card-{{ table.id }}">
+        <div class="card-body">
+            <div class="d-flex align-items-center">
+                <div class="subheader">Стол</div>
+                <div class="ms-auto">
+                    {% if table.status == 'active' %}
+                        <span class="badge bg-green-lt">Свободен</span>
+                    {% elif table.status == 'unavailable' %}
+                        <span class="badge bg-red-lt">Занят</span>
+                    {% else %}
+                        <span class="badge bg-yellow-lt">На обслуживании</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="h1 mb-3">{{ table.get_type_display }}</div>
+
+            <div class="d-flex mb-2">
+                <div>Цена: <strong>{{ table.price }} ₽/час</strong></div>
+            </div>
+
+            {% if table.status == 'active' %}
+                <div class="d-grid gap-2 mt-2">
+                    <button
+                        class="btn btn-primary"
+                        onclick="startGame('{{ table.id }}')">
+                        ▶ Начать игру
+                    </button>
+                    <button
+                        class="btn btn-warning"
+                        onclick="freezeTable('{{ table.id }}')">
+                        🔧 На обслуживание
+                    </button>
+                </div>
+
+            {% elif table.status == 'unavailable' %}
+                <div class="text-muted small mb-2 mt-2">
+                    Игра идёт...
+                </div>
+                <button class="btn btn-secondary w-100 mt-2" disabled>
+                    ⏸ Занят
+                </button>
+
+            {% else %}
+                <div class="text-muted small mb-2 mt-2">
+                    Причина: {{ table.unavailable_reason }}<br>
+                    До: {{ table.unavailable_until|date:"d.m.Y H:i" }}
+                </div>
+                <button class="btn btn-secondary w-100 mt-2" disabled>
+                    🔧 На обслуживании
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</div>

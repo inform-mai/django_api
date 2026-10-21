@@ -67,7 +67,7 @@ def start_session(table_id: uuid.UUID, client_id: uuid.UUID):
 
     result = {
         "start_success": True,
-        "game_session": str(game_session),
+        "game_session": str(game_session.id),
         "table": str(table),
         "start_at": game_session.start_at.isoformat(),
         "client_name": client.name
@@ -83,7 +83,7 @@ def end_session(session_id: uuid.UUID, client_id: uuid.UUID):
     except ObjectDoesNotExist:
         raise NotFoundError("Игра не найдена")
 
-    if game_session.client != client_id:
+    if not game_session.client or str(game_session.client_id) != str(client_id):
         raise ForbiddenError("Клиент, не участвующий в игре, не может её завершить!")
 
     client = game_session.client

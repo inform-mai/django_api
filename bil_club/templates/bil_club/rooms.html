@@ -1,0 +1,45 @@
+{% extends 'bil_club/base.html' %}
+{% load static %}
+
+
+{% block title %}Зал: {{ room.get_room_name_display }} - Бильярдный Клуб{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h2 class="page-title">Зал: {{ room.get_room_name_display }}</h2>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'bil_club:dashboard' %}" class="btn btn-secondary">
+                ← Назад к дашборду
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row row-deck row-cards mb-4">
+    {% include 'bil_club/components/_stats_card.html' with title="Всего столов" value=stats.total_tables icon="🎱" color="blue" %}
+    {% include 'bil_club/components/_stats_card.html' with title="Свободно" value=stats.active_tables icon="✅" color="green" %}
+    {% include 'bil_club/components/_stats_card.html' with title="Активных игр" value=stats.active_game_sessions icon="⏱️" color="red" %}
+</div>
+
+<div class="row row-cards">
+    {% for table in tables %}
+        {% include 'bil_club/components/_table_card.html' with table=table %}
+    {% empty %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center text-muted py-4">
+                    В этом зале пока нет столов.
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'bil_club/js/main.js' %}"></script>
+    <script src="{% static 'bil_club/js/dashboard.js' %}"></script>
+{% endblock %}

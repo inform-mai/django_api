@@ -1,0 +1,143 @@
+{% extends 'bil_club/base.html' %}
+{% load static %}
+
+
+{% block title %}Профиль клиента: {{ client.name }} - Бильярдный Клуб{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h2 class="page-title">Профиль клиента</h2>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'bil_club:clients' %}" class="btn btn-secondary">
+                ← Назад к списку
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row row-cards mb-4">
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <span class="avatar avatar-lg bg-blue-lt me-3"></span>
+                    <div>
+                        <h3 class="mb-0">{{ client.name }}</h3>
+                        <div class="text-muted">Клиент клуба</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="text-muted small">Телефон</div>
+                    <div class="fs-5">{{ client.phone }}</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="text-muted small">Уровень навыков</div>
+                    <div class="fs-5">
+                        {% if client.skill <= 1 %}
+                            <span class="badge bg-green-lt fs-4">{{ client.skill }} - Новичок</span>
+                        {% elif client.skill <= 3 %}
+                            <span class="badge bg-yellow-lt fs-4">{{ client.skill }} - Средний</span>
+                        {% else %}
+                            <span class="badge bg-red-lt fs-4">{{ client.skill }} - Профи</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-muted small">Дата регистрации</div>
+                    <div class="fs-5">{{ client.registered_at|date:"d.m.Y H:i" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title mb-4"> Статистика</h3>
+
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="text-muted small">Всего игр</div>
+                        <div class="fs-2 fw-bold text-blue">{{ stats.total_sessions }}</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-muted small">Потрачено</div>
+                        <div class="fs-2 fw-bold text-green">{{ stats.total_spent }} ₽</div>
+                    </div>
+                </div>
+
+                {% if stats.total_sessions > 0 %}
+                <div class="mt-4 pt-3 border-top">
+                    <div class="text-muted small">Средний чек</div>
+                    <div class="fs-4 fw-bold">
+                        {% widthratio stats.total_spent stats.total_sessions 1 %} ₽
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title"> История последних игр</h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-vcenter card-table">
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Стол</th>
+                    <th>Зал</th>
+                    <th>Длительность</th>
+                    <th>Стоимость</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for session in game_sessions %}
+                <tr>
+                    <td>{{ session.start_at|date:"d.m.Y H:i" }}</td>
+                    <td>{{ session.table.get_type_display }}</td>
+                    <td>{{ session.table.room.get_room_name_display }}</td>
+                    <td>
+                        {% if session.end_at %}
+                            {{ session.start_at|timeuntil:session.end_at }}
+                        {% else %}
+                            <span class="text-muted">Идёт...</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if session.total_cost %}
+                            <strong>{{ session.total_cost }} ₽</strong>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if session.is_active %}
+                            <span class="badge bg-green-lt">Активна</span>
+                        {% else %}
+                            <span class="badge bg-muted">Завершена</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">
+                        У клиента пока нет игр
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

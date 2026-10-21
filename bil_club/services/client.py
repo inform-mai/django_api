@@ -106,7 +106,7 @@ def get_client_profile(client_id):
     ).select_related('table', 'table__room').order_by('-start_at')[:10]
 
     result = {
-        "client": str(client),
+        "client": client,
         "stats": {
             "total_sessions": client_stats.get('total_sessions') or 0,
             "total_spent": client_stats.get('total_spent') or 0

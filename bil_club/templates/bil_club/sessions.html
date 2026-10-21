@@ -1,0 +1,67 @@
+{% extends 'bil_club/base.html' %}
+{% load static %}
+
+{% block title %}Активные игры - Бильярдный Клуб{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h2 class="page-title">Активные игры</h2>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-vcenter card-table">
+            <thead>
+                <tr>
+                    <th>Стол</th>
+                    <th>Клиент</th>
+                    <th>Начало игры</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="sessions-table-body">
+                {% for session in active_game_sessions %}
+                <tr id="session-row-{{ session.id }}">
+                    <td>
+                        <div>{{ session.table.get_type_display }}</div>
+                        <div class="text-muted small">{{ session.table.room.get_room_name_display }}</div>
+                    </td>
+                    <td>
+                        {% if session.client %}
+                            {{ session.client.name }}
+                        {% else %}
+                            <span class="text-muted">Гость</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ session.start_at|date:"d.m.Y H:i" }}
+                    </td>
+                    <td>
+                        <button
+                            class="btn btn-danger btn-sm"
+                            onclick="endSession('{{ session.id }}', '{% if session.client %}{{ session.client.id }}{% endif %}')">
+                            ⏹ Завершить
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">
+                        Нет активных игр
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'bil_club/js/main.js' %}"></script>
+    <script src="{% static 'bil_club/js/sessions.js' %}"></script>
+{% endblock %}

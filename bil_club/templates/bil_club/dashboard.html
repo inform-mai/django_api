@@ -1,0 +1,52 @@
+{% extends 'bil_club/base.html' %}
+
+{% block title %}Дашборд - Бильярдный Клуб{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h2 class="page-title">Управление клубом</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row row-deck row-cards mb-4">
+    {% include 'bil_club/components/_stats_card.html' with title="Всего столов" value=stats.total_tables icon="🎱" color="blue" %}
+    {% include 'bil_club/components/_stats_card.html' with title="Свободно" value=stats.active_tables icon="✅" color="green" %}
+    {% include 'bil_club/components/_stats_card.html' with title="Активных игр" value=stats.active_game_sessions icon="⏱️" color="red" %}
+    {% include 'bil_club/components/_stats_card.html' with title="Всего клиентов" value=stats.total_clients icon="👥" color="yellow" %}
+</div>
+
+{% for room in rooms %}
+    <div class="mb-4">
+        <h3 class="mb-3">
+            <a href="{% url 'bil_club:room_detail' room.id %}" class="text-decoration-none">
+                Зал: {{ room.get_room_name_display }}
+            </a>
+            <span class="badge bg-blue-lt text-blue ms-2">{{ room.table_count }} столов</span>
+        </h3>
+
+        <div class="row row-cards">
+            {% for table in room.table_set.all %}
+                {% include 'bil_club/components/_table_card.html' with table=table %}
+            {% empty %}
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body text-center text-muted">
+                            В этом зале пока нет столов.
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% empty %}
+    <div class="alert alert-info">Залы еще не созданы. Добавьте их через админ-панель.</div>
+{% endfor %}
+{% endblock %}
+
+{% block extra_js %}
+    <script src="/static/bil_club/js/main.js"></script>
+    <script src="/static/bil_club/js/dashboard.js"></script>
+{% endblock %}

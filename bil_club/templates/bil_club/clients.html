@@ -1,0 +1,151 @@
+{% extends 'bil_club/base.html' %}
+{% load static %}
+
+
+{% block title %}Клиенты - Бильярдный Клуб{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h2 class="page-title">Клиенты</h2>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addClientModal">
+                + Добавить клиента
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form id="filter-form" method="GET" action="{% url 'bil_club:clients' %}">
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label">Поиск по имени</label>
+                    <input
+                        type="text"
+                        name="name"
+                        class="form-control"
+                        placeholder="Введите имя..."
+                        value="{{ request.GET.name|default:'' }}">
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">Уровень навыков</label>
+                    <select name="skill" class="form-select">
+                        <option value="">Любой уровень</option>
+                        <option value="0" {% if request.GET.skill == '0' %}selected{% endif %}>0 - Новичок</option>
+                        <option value="1" {% if request.GET.skill == '1' %}selected{% endif %}>1</option>
+                        <option value="2" {% if request.GET.skill == '2' %}selected{% endif %}>2</option>
+                        <option value="3" {% if request.GET.skill == '3' %}selected{% endif %}>3</option>
+                        <option value="4" {% if request.GET.skill == '4' %}selected{% endif %}>4</option>
+                        <option value="5" {% if request.GET.skill == '5' %}selected{% endif %}>5 - Профи</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-secondary w-100">Фильтровать</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-vcenter card-table">
+            <thead>
+                <tr>
+                    <th>Имя</th>
+                    <th>Телефон</th>
+                    <th>Уровень навыков</th>
+                    <th>Дата регистрации</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="clients-table-body">
+                {% for client in clients %}
+                <tr id="client-row-{{ client.id }}">
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span class="avatar avatar-sm me-2 bg-blue-lt">👤</span>
+                            <div>
+                                <div class="text-truncate">{{ client.name }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ client.phone }}</td>
+                    <td>
+                        {% if client.skill <= 1 %}
+                            <span class="badge bg-green-lt">{{ client.skill }}</span>
+                        {% elif client.skill <= 3 %}
+                            <span class="badge bg-yellow-lt">{{ client.skill }}</span>
+                        {% else %}
+                            <span class="badge bg-red-lt">{{ client.skill }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted">
+                        {{ client.registered_at|date:"d.m.Y H:i" }}
+                    </td>
+                    <td>
+                        <a href="{% url 'bil_club:client_profile' client.id %}" class="btn btn-sm btn-outline-primary">
+                            Профиль
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">
+                        Клиенты не найдены
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="addClientModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Новый клиент</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="add-client-form" data-url="{% url 'bil_club:add_client' %}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Имя <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" required placeholder="Введите имя">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Телефон <span class="text-danger">*</span></label>
+                        <input type="text" name="phone" class="form-control" required placeholder="+79991234567">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Уровень навыков <span class="text-danger">*</span></label>
+                        <select name="skill" class="form-select" required>
+                            <option value="">Выберите уровень</option>
+                            <option value="0">0 - Новичок</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5 - Профи</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn me-auto" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'bil_club/js/main.js' %}"></script>
+    <script src="{% static 'bil_club/js/clients.js' %}"></script>
+{% endblock %}
