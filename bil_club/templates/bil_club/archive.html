@@ -1,0 +1,126 @@
+{% extends 'bil_club/base.html' %}
+{% load static %}
+
+
+{% block title %}Архив игр - Бильярдный Клуб{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col">
+            <h2 class="page-title">📚 Архив завершенных игр</h2>
+            <div class="text-muted">История всех сыгранных партий</div>
+        </div>
+    </div>
+</div>
+
+<div class="row row-cards">
+    <div class="col-lg-8">
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label">Поиск по клиенту</label>
+                        <input type="text" id="search-input" class="form-control" placeholder="Введите имя...">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Зал</label>
+                        <select id="room-filter" class="form-select">
+                            <option value="">Все залы</option>
+                            <option value="common">Обычный</option>
+                            <option value="premium">Премиум</option>
+                            <option value="gold">Золотой</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Сортировка</label>
+                        <select id="sort-select" class="form-select">
+                            <option value="-start_at">Сначала новые</option>
+                            <option value="start_at">Сначала старые</option>
+                            <option value="-total_cost">По убыванию цены</option>
+                            <option value="total_cost">По возрастанию цены</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body p-0">
+
+                <div id="loading-spinner" class="d-none">
+                    <div class="dimmer">
+                        <div class="spinner"></div>
+                        <div class="mt-3 text-center text-muted">Загрузка данных...</div>
+                    </div>
+                </div>
+
+                <div id="error-state" class="d-none p-4 text-center">
+                    <div class="text-danger fs-1">⚠️</div>
+                    <div class="text-danger">Произошла ошибка при загрузке данных</div>
+                    <button class="btn btn-sm btn-outline-danger mt-2" onclick="loadArchiveData()">Повторить</button>
+                </div>
+
+                <div id="empty-state" class="d-none p-4 text-center">
+                    <div class="text-muted fs-1"></div>
+                    <div class="text-muted">По вашему запросу ничего не найдено</div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-vcenter card-table d-none" id="archive-table">
+                        <thead>
+                            <tr>
+                                <th>Клиент</th>
+                                <th>Зал / Стол</th>
+                                <th>Дата</th>
+                                <th>Длит.</th>
+                                <th>Сумма</th>
+                            </tr>
+                        </thead>
+                        <tbody id="archive-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card-footer d-flex align-items-center d-none" id="pagination-controls">
+                <div class="text-muted ms-auto me-3" id="pagination-info">Страница 1</div>
+                <div class="btn-group">
+                    <button class="btn btn-outline-secondary" id="btn-prev" onclick="changePage(-1)">← Назад</button>
+                    <button class="btn btn-outline-secondary" id="btn-next" onclick="changePage(1)">Вперёд →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card" id="details-card">
+            <div class="card-body text-center text-muted py-5">
+                <div>Выберите игру из списка,<br>чтобы увидеть подробности</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="details-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Детали игры</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="details-modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'bil_club/js/main.js' %}"></script>
+    <script src="{% static 'bil_club/js/archive.js' %}"></script>
+{% endblock %}

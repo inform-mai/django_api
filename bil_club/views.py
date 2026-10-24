@@ -123,3 +123,36 @@ def update_table(request, table_id):
     except ValidationError as error:
         response = {"code": error.code, "detail": error.detail}
         return JsonResponse(response, status=error.code)
+
+
+def archive_sessions(request):
+    search = request.GET.get('search')
+    room_type = request.GET.get('room')
+    ordering = request.GET.get('ordering')
+
+    try:
+        page = int(request.GET.get('page', 1))
+    except ValueError:
+        page = 1
+
+    result = game_service.get_archive_sessions(
+        search=search,
+        room_type=room_type,
+        ordering=ordering,
+        page=page
+    )
+
+    return JsonResponse(result)
+
+
+def archive_page(request):
+    return render(request, 'bil_club/archive.html')
+
+
+def session_details(request, session_id):
+    try:
+        result = game_service.get_session_details(session_id)
+        return JsonResponse(result)
+    except NotFoundError as error:
+        response = {"code": error.code, "detail": error.detail}
+        return JsonResponse(response, status=error.code)

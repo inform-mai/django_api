@@ -13,4 +13,7 @@ urlpatterns = [
     path('api/sessions/end/<uuid:session_id>/', views.end_session, name='end_session'),
     path('api/clients/add/', views.add_client, name='add_client'),
     path('api/tables/<uuid:table_id>/status/', views.update_table, name='update_table'),
+    path('api/archive/sessions', views.archive_sessions, name='archive_sessions'),
+    path('archive/', views.archive_page, name='archive_page'),
+    path('api/archive/sessions/<uuid:session_id>/', views.session_details, name='session_details'),
 ]
